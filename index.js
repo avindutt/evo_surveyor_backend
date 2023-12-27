@@ -1,25 +1,47 @@
 const express = require('express');
 const passport = require('passport');
 const cors = require('cors');
-// const JwtStrategy = require('passport-jwt').Strategy;``
-// const ExtractJwt = require('passport-jwt').ExtractJwt;
-
+const session = require('express-session');
+const passportLocal = require('./config/passport-local-strategy');
+const MongoStore = require('connect-mongo');
 const app = express();
-const dotenv = require('dotenv');
+const db = require('./config/mongoose');
+
 
 app.use(cors());
-
-// load env variables to the file
-dotenv.config();
 
 // initialize passport
 app.use(passport.initialize());
 
-const db = require('./config/mongoose');
+
 
 // add middlewares to parse json and url-encoded data
 app.use(express.json());
 app.use(express.urlencoded());
+
+app.use(session({
+    name: 'evotech',
+    secret: 'global',
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+        maxAge: 5000000
+    },
+    // store: new MongoStore(
+    //     {
+    //         mongoUrl: db,
+    //         autoRemove: 'disabled'
+    //     },
+    //     function(err){
+    //         console.log(err || 'connect-mongo setup ok');
+    //     }
+    // )
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(passport.setAuthenticatedUser);
+
 
 app.use('/', require('./routes'));
 

@@ -19,3 +19,8 @@ module.exports.register = async (req, res) => {
         });
     }
 }
+
+module.exports.createSession = function(req, res){
+    console.log('Login successful');
+    return res.redirect('/get-submissions');
+}
